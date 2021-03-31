@@ -8,7 +8,7 @@ echo 'installing azure cli extension'
 iothubtoken=$(az iot hub generate-sas-token -n $iothub_name | jq .sas | tr -d \")
 
 
-for dev in {50..60}
+for dev in {61..70}
 do
     deviceId="device${dev}"
 
