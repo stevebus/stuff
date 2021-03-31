@@ -1,1 +1,1 @@
-echo '{"hello":"ARM"}' | jq -c > $AZ_SCRIPTS_OUTPUT_PATH
+echo '{"hello":"$0"}' | jq -c > $AZ_SCRIPTS_OUTPUT_PATH
