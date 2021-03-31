@@ -1,1 +1,7 @@
-echo '{"hello":"$0"}' | jq -c > $AZ_SCRIPTS_OUTPUT_PATH
+#echo '{"hello":"$0"}' | jq -c > $AZ_SCRIPTS_OUTPUT_PATH
+
+JSON_STRING=$( jq -n \
+                  --arg helloarg "$1" \
+                  '{hello: $helloarg}' )
+
+echo $JSON_STRING > $AZ_SCRIPTS_OUTPUT_PATH
