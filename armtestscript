@@ -1,7 +1,11 @@
 #echo '{"hello":"$0"}' | jq -c > $AZ_SCRIPTS_OUTPUT_PATH
 
+iothub_name=$1
+
+iothubtoken=$(az iot hub generate-sas-token -n $iothub_name | jq .sas | tr -d \")
+
 JSON_STRING=$( jq -n \
-                  --arg helloarg "$1" \
+                  --arg helloarg "$iothubtoken" \
                   '{hello: $helloarg}' )
 
 echo $JSON_STRING > $AZ_SCRIPTS_OUTPUT_PATH
