@@ -1,0 +1,24 @@
+{"devices":
+    [
+        {"hvac1":"hvac1-connection-string"},
+        {"hvac2":"hvac2-connection-string"},
+        {"hvac3":"hvac3-connection-string"},
+        {"hvac4":"hvac4-connection-string"},
+        {"hvac5":"hvac5-connection-string"},
+        {"lighting1":"lighting1-connection-string"},
+        {"lighting2":"lighting2-connection-string"},
+        {"lighting3":"lighting3-connection-string"},
+        {"lighting4":"lighting4-connection-string"},
+        {"lighting5":"lighting5-connection-string"},
+        {"presence1":"presence1-connection-string"},
+        {"presence2":"presence2-connection-string"},
+        {"presence3":"presence3-connection-string"},
+        {"presence4":"presence4-connection-string"},
+        {"presence5":"presence5-connection-string"},
+        {"temp1":"temp1-connection-string"},
+        {"temp2":"temp2-connection-string"},
+        {"temp3":"temp3-connection-string"},
+        {"temp4":"temp4-connection-string"},
+        {"temp5":"temp5-connection-string"}
+    ]
+}
