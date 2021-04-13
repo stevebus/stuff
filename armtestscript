@@ -1,26 +1,39 @@
 
 iothub_name=$1
-primaryKey='M4M04OgpQHC9RDfOUXwBwXvnFNWvcA/3MweXLHwhjBo='
-secondaryKey='M4M04OgpQHC9RDfOUXwBwXvnFNWvcA/3MweXLHwhjBo='
 
 echo "iot hub name: ${iothub_name}"
 
 echo 'installing azure cli extension'
 az extension add --name azure-iot -y
 
-# iothubtoken=$(az iot hub generate-sas-token -n $iothub_name | jq .sas | tr -d \")
-iothubtoken=$(az iot hub generate-sas-token -n $iothub_name -o tsv)
+devicetypes=("hvac" "lighting" "temp" "presence")
 
+iothubtoken=$(az iot hub generate-sas-token -n $iothub_name -o tsv)
 echo "iot hub token: ${iothubtoken}"
 
-for dev in {126..127}
-do
-    deviceId="device${dev}"
+curl https://raw.githubusercontent.com/stevebus/stuff/main/devices.json -o devicetemplate.json
 
-#####    data='{"deviceId":"'"$deviceId"'", "authentication":{"symmetricKey":{"primaryKey":"M4M04OgpQHC9RDfOUXwBwXvnFNWvcA/3MweXLHwhjBo=","secondaryKey":"M4M04OgpQHC9RDfOUXwBwXvnFNWvcA/3MweXLHwhjBo="}},"status":"enabled"}'
-#####    echo $data
-#    curl -L -i -g -X PUT -H 'Content-Type: application/json' -H 'Content-Encoding:  utf-8' -H "Authorization: $iothubtoken" -d '{"deviceId":"'"$deviceId"'", "authentication":{"symmetricKey":{"primaryKey":"'"$primaryKey"'","secondaryKey":"'"$secondaryKey"'"}},"status":"enabled"}' "https://$iothub_name.azure-devices.net/devices/$deviceId?api-version=2020-05-31-preview"
-#####    curl -L -g -X PUT -H 'Content-Type: application/json' -H 'Content-Encoding:  utf-8' -H "Authorization: $iothubtoken" -d $data "https://$iothub_name.azure-devices.net/devices/$deviceId?api-version=2020-05-31-preview"
+for devtype in "${devicetypes[@]}";
+do 
+    echo "$devtype"; 
+
+    for index in {1..5};
+    do
+        echo "$devtype$index"
+
+        connstr=$(az iot hub device-identity connection-string show -n $iothub_name -d $devtype$index -o tsv)
+        if [ -z "$connstr" ]
+        then
+            echo "device $devtype$index does not exist, creating... "
+#            curl -L -i -g -X PUT -H 'Content-Type: application/json' -H 'Content-Encoding:  utf-8' -H "Authorization: $iothubtoken" -d '{"deviceId":"'"$deviceId"'", "authentication":{"symmetricKey":{"primaryKey":"'"$primaryKey"'","secondaryKey":"'"$secondaryKey"'"}},"status":"enabled"}' "https://$iothub_name.azure-devices.net/devices/$deviceId?api-version=2020-05-31-preview"
+            resp=$(az iot hub device-identity create -n $iothub_name -d $devtype$index --query "authentication.symmetricKey.primaryKey" -o tsv)
+#            resp=$(az iot hub device-identity connection-string show -n $iothub_name -d $devtype$index --query "authentication.symmetricKey.primaryKey" -o tsv)
+            connstr="HostName=$iothub_name.azure-devices.net;DeviceId=$devtype$index;SharedAccessKey=$resp"
+        fi
+
+        echo $connstr
+        sed -i s~"$devtype$index-connection-string"~"$connstr"~ devicetemplate.json
+    done
 done
 
 JSON_STRING=$( jq -n \
