@@ -1,17 +1,17 @@
 
-iothub_name=$1
-adt_name=$2
+iothubname=$1
+adtname=$2
 rgname=$3
 egname=$4
 
-echo "iot hub name: ${iothub_name}"
+echo "iot hub name: ${iothubname}"
 
 echo 'installing azure cli extension'
 az extension add --name azure-iot -y
 
 devicetypes=("hvac" "lighting" "temp" "presence")
 
-iothubtoken=$(az iot hub generate-sas-token -n $iothub_name -o tsv)
+iothubtoken=$(az iot hub generate-sas-token -n $iothubname -o tsv)
 echo "iot hub token: ${iothubtoken}"
 
 curl https://raw.githubusercontent.com/stevebus/stuff/main/devices.json -o devicetemplate.json
@@ -24,14 +24,14 @@ do
     do
         echo "$devtype$index"
 
-        connstr=$(az iot hub device-identity connection-string show -n $iothub_name -d $devtype$index -o tsv)
+        connstr=$(az iot hub device-identity connection-string show -n $iothubname -d $devtype$index -o tsv)
         if [ -z "$connstr" ]
         then
             echo "device $devtype$index does not exist, creating... "
 #            curl -L -i -g -X PUT -H 'Content-Type: application/json' -H 'Content-Encoding:  utf-8' -H "Authorization: $iothubtoken" -d '{"deviceId":"'"$deviceId"'", "authentication":{"symmetricKey":{"primaryKey":"'"$primaryKey"'","secondaryKey":"'"$secondaryKey"'"}},"status":"enabled"}' "https://$iothub_name.azure-devices.net/devices/$deviceId?api-version=2020-05-31-preview"
-            resp=$(az iot hub device-identity create -n $iothub_name -d $devtype$index --query "authentication.symmetricKey.primaryKey" -o tsv)
+            resp=$(az iot hub device-identity create -n $iothubname -d $devtype$index --query "authentication.symmetricKey.primaryKey" -o tsv)
 #            resp=$(az iot hub device-identity connection-string show -n $iothub_name -d $devtype$index --query "authentication.symmetricKey.primaryKey" -o tsv)
-            connstr="HostName=$iothub_name.azure-devices.net;DeviceId=$devtype$index;SharedAccessKey=$resp"
+            connstr="HostName=$iothubname.azure-devices.net;DeviceId=$devtype$index;SharedAccessKey=$resp"
         fi
 
         echo $connstr
@@ -44,12 +44,12 @@ az dt endpoint create eventgrid --dt-name $adtname --eventgrid-resource-group $r
 az dt route create --dt-name $adtname --endpoint-name "$egname-ep" --route-name "$egname-rt"
 
 JSON_STRING=$( jq -n \
-                  --arg hubname "$iothub_name" \
-                  --arg hubtoken "$iothubtoken" \
-                  --arg adtname "$adtname" \
-                  --arg rgname "$rgname" \
-                  --arg egname "$egname" \
-                  '{hubname: $hubname, hubtoken: $hubtoken, adtname: $adtname, rgname: $rgname, egname: $egname}' )
+                  --arg hubnametoken "$iothubname" \
+                  --arg hubtokentoken "$iothubtoken" \
+                  --arg adtnametoken "$adtname" \
+                  --arg rgnametoken "$rgname" \
+                  --arg egnametoken "$egname" \
+                  '{hubname: $hubnametoken, hubtoken: $hubtokentoken, adtname: $adtnametoken, rgname: $rgnametoken, egname: $egnametoken}' )
 
 # echo $JSON_STRING
 
