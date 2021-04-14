@@ -1,5 +1,8 @@
 
 iothub_name=$1
+adt_name=$2
+rgname=$3
+egname=$4
 
 echo "iot hub name: ${iothub_name}"
 
@@ -36,10 +39,17 @@ do
     done
 done
 
+# az eventgrid topic create -g testrg4 --name adtchangelog -l eastus2
+az dt endpoint create eventgrid --dt-name $adtname --eventgrid-resource-group $rgname --eventgrid-topic $egname --endpoint-name "$egname-ep"
+az dt route create --dt-name $adtname --endpoint-name "$egname-ep" --route-name "$egname-rt"
+
 JSON_STRING=$( jq -n \
                   --arg hubname "$iothub_name" \
                   --arg hubtoken "$iothubtoken" \
-                  '{hubname: $hubname, hubtoken: $hubtoken}' )
+                  --arg adtname "$adtname" \
+                  --arg rgname "$rgname" \
+                  --arg egname "$egname" \
+                  '{hubname: $hubname, hubtoken: $hubtoken, adtname: $adtname, rgname: $rgname, egname: $egname}' )
 
 # echo $JSON_STRING
 
