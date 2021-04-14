@@ -40,8 +40,8 @@ do
 done
 
 # az eventgrid topic create -g testrg4 --name adtchangelog -l eastus2
-az dt endpoint create eventgrid --dt-name $adtname --eventgrid-resource-group $rgname --eventgrid-topic $egname --endpoint-name "$egname-ep"
-az dt route create --dt-name $adtname --endpoint-name "$egname-ep" --route-name "$egname-rt"
+# az dt endpoint create eventgrid --dt-name $adtname --eventgrid-resource-group $rgname --eventgrid-topic $egname --endpoint-name "$egname-ep"
+# az dt route create --dt-name $adtname --endpoint-name "$egname-ep" --route-name "$egname-rt"
 
 JSON_STRING=$( jq -n \
                   --arg hubnametoken "$iothubname" \
